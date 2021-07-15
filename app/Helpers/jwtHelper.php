@@ -193,30 +193,3 @@ if(!function_exists('request_header')){
 		}  
 	}
 }
-
-// if(!function_exists('request_header')){
-// 	function request_header(){
-// 		$ci = & get_instance();
-// 		$headers = $ci->input->request_headers();
-// 		if(!isset($headers['Authorization'])){
-// 			return_api(false, 'Please Send Authorization token!');
-// 		}
-//         $token = $headers['Authorization'];
-//         $jwt = new JWT();
-// 		try{
-// 			$payload = $jwt->decode($token, key);
-// 			$ret = object_to_array(json_decode($payload)); 
-// 			$ci->db->select('token');
-// 			$ci->db->where('id', $ret['id']);
-// 			$tok = $ci->db->get('users')->row_array();
-// 			if($tok['token'] === $token){
-// 				// return_api(true, 'Access Authorize');  
-// 				return $ret;    			
-// 			}else{
-// 				return_api(true, 'UnAuthorize Access Token missmatch!', 401);
-// 			}			
-// 		}catch(Exception $e){
-// 			return_api(true, 'UnAuthorize Access!', 401);
-// 		}  
-// 	}
-// }
