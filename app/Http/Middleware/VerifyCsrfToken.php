@@ -13,6 +13,9 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'meet-and-greet/search',
-        'order/meet-and-greet'
+        'order/meet-and-greet',
+        'order/airport-lounge',
+        'order/covid-rtpcr',
+        'login'
     ];
 }

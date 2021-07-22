@@ -15,14 +15,17 @@ use App\Http\Controllers\Order;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Route::post('/meet-and-greet/search', [Service::class, 'meetAndGreet']);
-Route::get('/login', [AuthController::class, 'Login']);
+Route::get('/meet-and-greet/search/{serviceId}', [Service::class, 'meetAndGreetDetail']);
+Route::post('/login', [AuthController::class, 'Login']);
 Route::get('/service/airport', [Service::class, 'getServiceAirport']);
 Route::get('/airport-list', [Service::class, 'getAirportList']);
+Route::get('country-list', [Service::class, 'getCountryList']);
+
 Route::get('/airport-lounge/search', [Service::class, 'lounge']);
 
 Route::post('order/meet-and-greet', [Order::class, 'meetAndGreet']);

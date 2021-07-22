@@ -108,7 +108,6 @@ if (!function_exists('convert_currency')) {
         }
     }
 }
-
 if (!function_exists('getMngFee')) {
     function getMngFee($adult = 1, $child = 0, $serviceId, $currency = NULL)
     {
@@ -131,7 +130,29 @@ if (!function_exists('getMngFee')) {
         return $amount;
     }
 }
-
+if (!function_exists('getLoungeFee')) {
+    function getLoungeFee($adult = 1, $child = 0, $serviceId, $service_hour, $currency = NULL) //$service_hour=requested service hour
+    {
+        $adult = $adult + $child;
+        $service = DB::table('mng_product')->join("mng_product_fee", 'mng_product_fee.id', '=', 'mng_product.activeFeeId')->where('mng_product.id', $serviceId)
+            ->select("mng_product_fee.currency", "mng_product_fee.adultServiceFee" . $adult,  "mng_product_fee.childServiceFee1", "mng_product_fee.currency", "mng_product.service_hours", "mng_product_fee.childAge", "mng_product.terminal")
+            ->get()->first();
+        $ser = object_to_array($service);
+        $amount = $ser['adultServiceFee' . $adult];
+        $extraAdultServiceFee = 0;
+        if ($service_hour > $service->service_hours) {
+            $extraHour                  = ($service_hour - $service->service_hours);
+            $extra                      = ceil($extraHour / $service->childAge);
+            $FServiceHour               = $service->service_hours + ($extra * $service->childAge);
+            $extraAdultServiceFee       = ($adult * ($extra * $service->childServiceFee1));
+        }
+        $serviceFee = $amount + $extraAdultServiceFee;
+        if (!empty($currency)) {
+            $serviceFee = convert_currency($currency, $ser['currency'], $serviceFee);
+        }
+        return $serviceFee;
+    }
+}
 if (!function_exists('generate_reference_id')) {
     function generate_reference_id()
     {
@@ -139,5 +160,41 @@ if (!function_exists('generate_reference_id')) {
         $reference_id = $reference_id->series;
         DB::table('form_series')->where('country', 'travibble')->update(['series' => $reference_id + 1]);
         return $reference_id;
+    }
+}
+if (!function_exists('applicationFeeCreate')) {
+    function applicationFeeCreate($reference_id, $serviceId, $feeId)
+    {
+        $serviceFee = DB::table('mng_product_fee')->where('id', $feeId)->get()->first();
+        $feeData = array(
+            'reference_id'        =>    $reference_id,
+            'serviceId'            =>    $serviceId,
+            'feeId'             =>  $serviceFee->id,
+            'currency'            =>    $serviceFee->currency,
+            'pricingType'       =>  $serviceFee->pricingType,
+            'childAge'          =>  $serviceFee->childAge,
+            'adultServiceFee1'    =>    $serviceFee->adultServiceFee1,
+            'adultServiceFee2'    =>    $serviceFee->adultServiceFee2,
+            'adultServiceFee3'    =>    $serviceFee->adultServiceFee3,
+            'adultServiceFee4'    =>    $serviceFee->adultServiceFee4,
+            'adultServiceFee5'    =>    $serviceFee->adultServiceFee5,
+            'adultServiceFee6'    =>    $serviceFee->adultServiceFee6,
+            'adultServiceFee7'    =>    $serviceFee->adultServiceFee7,
+            'adultServiceFee8'    =>    $serviceFee->adultServiceFee8,
+            'adultServiceFee9'    =>    $serviceFee->adultServiceFee9,
+            'adultServiceFee10'    =>    $serviceFee->adultServiceFee10,
+            'childServiceFee1'    =>    $serviceFee->childServiceFee1,
+            'childServiceFee2'    =>    $serviceFee->childServiceFee2,
+            'childServiceFee3'    =>    $serviceFee->childServiceFee3,
+            'childServiceFee4'    =>    $serviceFee->childServiceFee4,
+            'childServiceFee5'    =>    $serviceFee->childServiceFee5,
+            'childServiceFee6'    =>    $serviceFee->childServiceFee6,
+            'childServiceFee7'    =>    $serviceFee->childServiceFee7,
+            'childServiceFee8'    =>    $serviceFee->childServiceFee8,
+            'childServiceFee9'    =>    $serviceFee->childServiceFee9,
+            'childServiceFee10'    =>    $serviceFee->childServiceFee10,
+            'insertedDate'        =>    time(),
+        );
+        $status = DB::table('applications_mng_fee')->insert($feeData);
     }
 }
